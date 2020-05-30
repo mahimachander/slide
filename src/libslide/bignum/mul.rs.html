@@ -104,6 +104,11 @@
 <span id="104">104</span>
 <span id="105">105</span>
 <span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">suspicious_arithmetic_impl</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">bignum</span>::<span class="ident">utils</span>::<span class="ident">convert_poly</span>;
@@ -161,17 +166,14 @@
         )
         .<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dec_vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">convert_poly</span>(<span class="ident">res</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">int_vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">dec_vec</span>.<span class="ident">split_off</span>(<span class="ident">dec_len</span>);
+        <span class="kw">let</span> <span class="ident">int_vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">dec_vec</span>.<span class="ident">split_off</span>(<span class="ident">dec_len</span>);
 
         <span class="comment">// remove preceeding zeros</span>
         <span class="ident">dec_vec</span> <span class="op">=</span> <span class="ident">dec_vec</span>.<span class="ident">into_iter</span>().<span class="ident">rev</span>().<span class="ident">collect</span>();
-        <span class="ident">int_vec</span> <span class="op">=</span> <span class="ident">truncate_zeros</span>(<span class="ident">int_vec</span>);
-        <span class="ident">dec_vec</span> <span class="op">=</span> <span class="ident">truncate_zeros</span>(<span class="ident">dec_vec</span>);
-
         <span class="ident">Bignum</span> {
             <span class="ident">is_neg</span>,
-            <span class="ident">int</span>: <span class="ident">int_vec</span>,
-            <span class="ident">dec</span>: <span class="ident">dec_vec</span>,
+            <span class="ident">int</span>: <span class="ident">truncate_zeros</span>(<span class="ident">int_vec</span>),
+            <span class="ident">dec</span>: <span class="ident">truncate_zeros</span>(<span class="ident">dec_vec</span>),
         }
     }
 }
@@ -208,8 +210,16 @@
             <span class="ident">float3</span>: <span class="string">&quot;0.192781230589&quot;</span>, <span class="string">&quot;0.12182387511&quot;</span>, <span class="string">&quot;0.02348535655882644773979&quot;</span>
             <span class="ident">mixed1</span>: <span class="string">&quot;1.0&quot;</span>, <span class="string">&quot;1.0&quot;</span>, <span class="string">&quot;1&quot;</span>
             <span class="ident">mixed2</span>: <span class="string">&quot;12912572835.19235098273&quot;</span>, <span class="string">&quot;19325812.193812388322389&quot;</span>, <span class="string">&quot;249545957551850939.50568665382187490021134197&quot;</span>
+            <span class="ident">zero1</span>: <span class="string">&quot;0000.00&quot;</span>, <span class="string">&quot;0&quot;</span>, <span class="string">&quot;0&quot;</span>
+            <span class="ident">zero2</span>: <span class="string">&quot;0.0000&quot;</span>, <span class="string">&quot;0&quot;</span>, <span class="string">&quot;0&quot;</span>
+            <span class="ident">zero3</span>: <span class="string">&quot;0&quot;</span>, <span class="string">&quot;0.000&quot;</span>, <span class="string">&quot;0&quot;</span>
+            <span class="ident">zero4</span>: <span class="string">&quot;0.0&quot;</span>, <span class="string">&quot;00.00&quot;</span>, <span class="string">&quot;0&quot;</span>
+            <span class="ident">zero5</span>: <span class="string">&quot;-0&quot;</span>, <span class="string">&quot;00.00&quot;</span>, <span class="string">&quot;0&quot;</span>
+            <span class="ident">zero6</span>: <span class="string">&quot;0.0000&quot;</span>, <span class="string">&quot;-00000.000&quot;</span>, <span class="string">&quot;0&quot;</span>
+            <span class="ident">zero7</span>: <span class="string">&quot;-0.00&quot;</span>, <span class="string">&quot;-0000.00&quot;</span>, <span class="string">&quot;0&quot;</span>
+            <span class="ident">trailing_zero1</span>: <span class="string">&quot;1.00000&quot;</span>, <span class="string">&quot;000001.0000&quot;</span>, <span class="string">&quot;1&quot;</span>
         }
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "libslide";</script><script src="../../../aliases.js"></script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "libslide";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
