@@ -502,9 +502,9 @@ Specifically, source &quot;{}&quot; is missing pattern(s) {} present in target &
                     <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">transform</span>(<span class="ident">rule</span>, <span class="ident">Rc</span>::<span class="ident">clone</span>(<span class="ident">expr</span>), <span class="ident">cache</span>);
                     <span class="ident">Expr</span>::<span class="ident">Parend</span>(<span class="ident">inner</span>).<span class="ident">into</span>()
                 }
-                <span class="ident">Expr</span>::<span class="ident">Braced</span>(<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Expr</span>::<span class="ident">Bracketed</span>(<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">transform</span>(<span class="ident">rule</span>, <span class="ident">Rc</span>::<span class="ident">clone</span>(<span class="ident">expr</span>), <span class="ident">cache</span>);
-                    <span class="ident">Expr</span>::<span class="ident">Braced</span>(<span class="ident">inner</span>).<span class="ident">into</span>()
+                    <span class="ident">Expr</span>::<span class="ident">Bracketed</span>(<span class="ident">inner</span>).<span class="ident">into</span>()
                 }
             }
         }
@@ -583,9 +583,9 @@ Specifically, source &quot;{}&quot; is missing pattern(s) {} present in target &
                 <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">transform</span>(<span class="ident">Rc</span>::<span class="ident">clone</span>(<span class="ident">expr</span>));
                 <span class="ident">ExprPat</span>::<span class="ident">Parend</span>(<span class="ident">inner</span>).<span class="ident">into</span>()
             }
-            <span class="ident">ExprPat</span>::<span class="ident">Braced</span>(<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ExprPat</span>::<span class="ident">Bracketed</span>(<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">transform</span>(<span class="ident">Rc</span>::<span class="ident">clone</span>(<span class="ident">expr</span>));
-                <span class="ident">ExprPat</span>::<span class="ident">Braced</span>(<span class="ident">inner</span>).<span class="ident">into</span>()
+                <span class="ident">ExprPat</span>::<span class="ident">Bracketed</span>(<span class="ident">inner</span>).<span class="ident">into</span>()
             }
         };
 
@@ -654,4 +654,4 @@ Specifically, source &quot;_a + $b / #c * 3&quot; is missing pattern(s) &quot;#e
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "libslide";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "libslide";</script><script src="../../../aliases.js"></script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
