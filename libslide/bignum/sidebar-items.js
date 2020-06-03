@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["to_char",""],["to_u8",""]],"mod":[["add",""],["compare",""],["complex",""],["modulo",""],["mul",""],["negate",""],["sub",""],["utils",""]],"static":[["INPUT_ERR_MSG",""]],"struct":[["Bignum",""]]});
