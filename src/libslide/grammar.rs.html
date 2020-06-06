@@ -351,6 +351,39 @@
 <span id="351">351</span>
 <span id="352">352</span>
 <span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">mod</span> <span class="ident">pattern</span>;
 <span class="kw">mod</span> <span class="ident">transformer</span>;
@@ -364,7 +397,14 @@
 <span class="kw">use</span> <span class="ident">core</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">rc</span>::<span class="ident">Rc</span>;
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Grammar</span> {}
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Grammar</span>
+<span class="kw">where</span>
+    <span class="self">Self</span>: <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="op">+</span> <span class="ident">fmt</span>::<span class="ident">Debug</span>,
+{
+    <span class="doccomment">/// Returns the S-expression form of this expression.</span>
+    <span class="doccomment">/// For example, 1 + 1 -&gt; (+ 1 1).</span>
+    <span class="kw">fn</span> <span class="ident">s_form</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>;
+}
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Expression</span>
 <span class="kw">where</span>
     <span class="self">Self</span>: <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">BinaryExpr</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">UnaryExpr</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -372,13 +412,20 @@
     <span class="kw">fn</span> <span class="ident">is_const</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Stmt</span> {
     <span class="ident">Expr</span>(<span class="ident">Expr</span>),
     <span class="ident">Assignment</span>(<span class="ident">Assignment</span>),
 }
 
-<span class="kw">impl</span> <span class="ident">Grammar</span> <span class="kw">for</span> <span class="ident">Stmt</span> {}
+<span class="kw">impl</span> <span class="ident">Grammar</span> <span class="kw">for</span> <span class="ident">Stmt</span> {
+    <span class="kw">fn</span> <span class="ident">s_form</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="self">Self</span>::<span class="ident">Expr</span>(<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">expr</span>.<span class="ident">s_form</span>(),
+            <span class="self">Self</span>::<span class="ident">Assignment</span>(<span class="ident">Assignment</span> { <span class="ident">var</span>, <span class="ident">rhs</span> }) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;(= {} {})&quot;</span>, <span class="ident">var</span>, <span class="ident">rhs</span>.<span class="ident">s_form</span>()),
+        }
+    }
+}
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Stmt</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">expr</span>: <span class="ident">Expr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
@@ -406,7 +453,7 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Assignment</span> {
     <span class="kw">pub</span> <span class="ident">var</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">rhs</span>: <span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span>,
@@ -500,8 +547,27 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Grammar</span> <span class="kw">for</span> <span class="ident">Expr</span> {}
-<span class="kw">impl</span> <span class="ident">Grammar</span> <span class="kw">for</span> <span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span> <span class="ident">Grammar</span> <span class="kw">for</span> <span class="ident">Expr</span> {
+    <span class="kw">fn</span> <span class="ident">s_form</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="self">Self</span>::<span class="ident">Const</span>(<span class="ident">konst</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">konst</span>.<span class="ident">to_string</span>(),
+            <span class="self">Self</span>::<span class="ident">Var</span>(<span class="ident">var</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">var</span>.<span class="ident">to_string</span>(),
+            <span class="self">Self</span>::<span class="ident">BinaryExpr</span>(<span class="ident">BinaryExpr</span> { <span class="ident">op</span>, <span class="ident">lhs</span>, <span class="ident">rhs</span> }) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;({} {} {})&quot;</span>, <span class="ident">op</span>.<span class="ident">to_string</span>(), <span class="ident">lhs</span>.<span class="ident">s_form</span>(), <span class="ident">rhs</span>.<span class="ident">s_form</span>())
+            }
+            <span class="self">Self</span>::<span class="ident">UnaryExpr</span>(<span class="ident">UnaryExpr</span> { <span class="ident">op</span>, <span class="ident">rhs</span> }) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;({} {})&quot;</span>, <span class="ident">op</span>.<span class="ident">to_string</span>(), <span class="ident">rhs</span>.<span class="ident">s_form</span>())
+            }
+            <span class="self">Self</span>::<span class="ident">Parend</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;({})&quot;</span>, <span class="ident">inner</span>.<span class="ident">s_form</span>()),
+            <span class="self">Self</span>::<span class="ident">Bracketed</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;[{}]&quot;</span>, <span class="ident">inner</span>.<span class="ident">s_form</span>()),
+        }
+    }
+}
+<span class="kw">impl</span> <span class="ident">Grammar</span> <span class="kw">for</span> <span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">s_form</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">s_form</span>()
+    }
+}
 <span class="kw">impl</span> <span class="ident">Expression</span> <span class="kw">for</span> <span class="ident">Expr</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">is_const</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
@@ -706,4 +772,4 @@
 <span class="macro">display_unary_expr</span><span class="macro">!</span>(<span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span>);
 <span class="macro">display_unary_expr</span><span class="macro">!</span>(<span class="op">&lt;</span><span class="ident">ExprPat</span><span class="op">&gt;</span>);
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "libslide";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "libslide";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
