@@ -21,17 +21,32 @@
 <span id="21">21</span>
 <span id="22">22</span>
 <span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">evaluator_rules</span>::<span class="ident">RuleName</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EvaluatorContext</span> {
+    <span class="doccomment">/// Rules that should not be included in the evaluation of an expression.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">rule_blacklist</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RuleName</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// Whether an expression should always be flattened before it is further evaluated.</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">always_flatten</span>: <span class="ident">bool</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">EvaluatorContext</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">rule_blacklist</span>: <span class="macro">vec</span><span class="macro">!</span>[],
+            <span class="ident">always_flatten</span>: <span class="bool-val">true</span>,
         }
     }
 }
@@ -42,6 +57,11 @@
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RuleName</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
         <span class="self">self</span>.<span class="ident">rule_blacklist</span> <span class="op">=</span> <span class="ident">rule_blacklist</span>.<span class="ident">into</span>();
+        <span class="self">self</span>
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">always_flatten</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flatten</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">always_flatten</span> <span class="op">=</span> <span class="ident">flatten</span>;
         <span class="self">self</span>
     }
 }
