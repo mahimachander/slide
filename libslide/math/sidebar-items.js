@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["gcd",""]]});
+initSidebarItems({"mod":[["gcd",""],["gcd_poly_zz",""],["poly",""]]});
