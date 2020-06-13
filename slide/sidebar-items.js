@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["OutputForm",""]],"fn":[["get_opts",""],["main",""],["print",""]],"struct":[["Opts",""]]});
+initSidebarItems({});
