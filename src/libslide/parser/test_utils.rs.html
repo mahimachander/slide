@@ -69,7 +69,7 @@
         } <span class="kw">else</span> {
             <span class="ident">pin</span>.<span class="ident">to_owned</span>()
         };
-        <span class="kw">let</span> <span class="ident">tokens</span> <span class="op">=</span> <span class="ident">scan</span>(<span class="ident">pin</span>);
+        <span class="kw">let</span> <span class="ident">tokens</span> <span class="op">=</span> <span class="ident">scan</span>(<span class="ident">pin</span>).<span class="ident">tokens</span>;
         <span class="kw">let</span> (<span class="ident">parsed</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>(<span class="ident">tokens</span>);
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">parsed</span>.<span class="ident">to_string</span>(), <span class="ident">pout</span>);
     };
@@ -112,7 +112,7 @@
             <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">scanner</span>::{<span class="ident">scan</span>};
             <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">parser</span>::{<span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>};
 
-            <span class="kw">let</span> <span class="ident">tokens</span> <span class="op">=</span> <span class="ident">scan</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">program</span>);
+            <span class="kw">let</span> <span class="ident">tokens</span> <span class="op">=</span> <span class="ident">scan</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">program</span>).<span class="ident">tokens</span>;
             <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">errors</span>) <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>(<span class="ident">tokens</span>);
             <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">errors</span>.<span class="ident">join</span>(<span class="string">&quot;\n&quot;</span>), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">error</span>);
         }
@@ -120,4 +120,4 @@
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "libslide";</script><script src="../../../aliases.js"></script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "libslide";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>

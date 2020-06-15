@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["TokenType",""]],"struct":[["Span","Describes the character span of a substring in a text."],["Token","Describes a token in a slide program."]]});
+initSidebarItems({"enum":[["TokenType",""]],"struct":[["Token","Describes a token in a slide program."]]});

@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["scan",""]],"mod":[["types",""]],"struct":[["Scanner",""]]});
+initSidebarItems({"fn":[["scan",""]],"mod":[["types",""]],"struct":[["ScanResult",""],["Scanner",""]]});
