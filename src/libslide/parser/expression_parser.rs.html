@@ -171,13 +171,10 @@
 <span id="171">171</span>
 <span id="172">172</span>
 <span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Parser</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">common</span>::<span class="ident">Span</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">diagnostics</span>::<span class="ident">Diagnostic</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">grammar</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">scanner</span>::<span class="ident">types</span>::{<span class="ident">Token</span>, <span class="ident">TokenType</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">utils</span>::{<span class="ident">hash</span>, <span class="ident">PeekIter</span>, <span class="ident">StringUtils</span>};
@@ -185,16 +182,19 @@
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">rc</span>::<span class="ident">Rc</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Token</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Stmt</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) {
+<span class="comment">// pub struct ScanResult {</span>
+<span class="comment">//     pub tokens: Vec&lt;Token&gt;,</span>
+<span class="comment">//     pub diagnostics: Vec&lt;Diagnostic&gt;,</span>
+<span class="comment">// }</span>
+
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Token</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Stmt</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Diagnostic</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">ExpressionParser</span>::<span class="ident">new</span>(<span class="ident">input</span>);
-    <span class="kw">let</span> <span class="ident">parsed</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse</span>();
-    <span class="kw">let</span> <span class="ident">errors</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">errors</span>().<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">to_string</span>()).<span class="ident">collect</span>();
-    (<span class="ident">parsed</span>, <span class="ident">errors</span>)
+    (<span class="ident">parser</span>.<span class="ident">parse</span>(), <span class="ident">parser</span>.<span class="ident">diagnostics</span>)
 }
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ExpressionParser</span> {
     <span class="ident">_input</span>: <span class="ident">PeekIter</span><span class="op">&lt;</span><span class="ident">Token</span><span class="op">&gt;</span>,
-    <span class="ident">_errors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="ident">diagnostics</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Diagnostic</span><span class="op">&gt;</span>,
     <span class="comment">// We use an untyped hash here because we don&#39;t want to clone an Expr into the map in case it&#39;s</span>
     <span class="comment">// already there when using an entry API.</span>
     <span class="comment">// TODO: replace with Expr when raw_entry API is stabilized (see rust#56167)</span>
@@ -211,37 +211,42 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ExpressionParser</span> {
-    <span class="kw">fn</span> <span class="ident">parse_pattern</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expr</span> {
-        <span class="self">self</span>.<span class="ident">_errors</span>.<span class="ident">push</span>(<span class="macro">format</span><span class="macro">!</span>(
-            <span class="macro">concat</span><span class="macro">!</span>(
-                <span class="string">r#&quot;The pattern &quot;{name}&quot; cannot be used in an expression. &quot;#</span>,
-                <span class="string">r#&quot;Consider using &quot;{cut_name}&quot; as a variable instead.&quot;#</span>
+    <span class="kw">fn</span> <span class="ident">parse_pattern</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">span</span>: <span class="ident">Span</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Expr</span> {
+        <span class="self">self</span>.<span class="ident">push_diag</span>(
+            <span class="ident">Diagnostic</span>::<span class="ident">span_err</span>(
+                <span class="ident">span</span>,
+                <span class="string">&quot;Patterns cannot be used in an expression&quot;</span>,
+                <span class="prelude-val">Some</span>(<span class="string">&quot;unexpected pattern&quot;</span>.<span class="ident">into</span>()),
+            )
+            .<span class="ident">with_help</span>(
+                <span class="ident">span</span>,
+                <span class="macro">format</span><span class="macro">!</span>(
+                    <span class="string">r#&quot;consider using &quot;{cut_name}&quot; as a variable&quot;#</span>,
+                    <span class="ident">cut_name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">substring</span>(<span class="number">1</span>, <span class="ident">name</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>)
+                ),
             ),
-            <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>,
-            <span class="ident">cut_name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">to_string</span>().<span class="ident">substring</span>(<span class="number">1</span>, <span class="ident">name</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>),
-        ));
+        );
         <span class="ident">Expr</span>::<span class="ident">Var</span>(<span class="ident">name</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">Stmt</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ExpressionParser</span> {
     <span class="kw">type</span> <span class="ident">Expr</span> <span class="op">=</span> <span class="ident">Expr</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">String</span>;
 
     <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">input</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Token</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">_input</span>: <span class="ident">PeekIter</span>::<span class="ident">new</span>(<span class="ident">input</span>.<span class="ident">into_iter</span>()),
-            <span class="ident">_errors</span>: <span class="macro">vec</span><span class="macro">!</span>[],
+            <span class="ident">diagnostics</span>: <span class="macro">vec</span><span class="macro">!</span>[],
             <span class="ident">seen</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">errors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">_errors</span>
-    }
-
     <span class="kw">fn</span> <span class="ident">input</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">PeekIter</span><span class="op">&lt;</span><span class="ident">Token</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">_input</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">push_diag</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">diagnostic</span>: <span class="ident">Diagnostic</span>) {
+        <span class="self">self</span>.<span class="ident">diagnostics</span>.<span class="ident">push</span>(<span class="ident">diagnostic</span>);
     }
 
     <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Stmt</span> {
@@ -258,34 +263,36 @@
         <span class="ident">parsed</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_float</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Expr</span> {
+    <span class="kw">fn</span> <span class="ident">parse_float</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">f64</span>, <span class="ident">_span</span>: <span class="ident">Span</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Expr</span> {
         <span class="self">Self</span>::<span class="ident">Expr</span>::<span class="ident">Const</span>(<span class="ident">f</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_variable</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Expr</span> {
+    <span class="kw">fn</span> <span class="ident">parse_variable</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">_span</span>: <span class="ident">Span</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Expr</span> {
         <span class="ident">Expr</span>::<span class="ident">Var</span>(<span class="ident">name</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_var_pattern</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Expr</span> {
-        <span class="self">self</span>.<span class="ident">parse_pattern</span>(<span class="ident">name</span>)
+    <span class="kw">fn</span> <span class="ident">parse_var_pattern</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">span</span>: <span class="ident">Span</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Expr</span> {
+        <span class="self">self</span>.<span class="ident">parse_pattern</span>(<span class="ident">name</span>, <span class="ident">span</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_const_pattern</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Expr</span> {
-        <span class="self">self</span>.<span class="ident">parse_pattern</span>(<span class="ident">name</span>)
+    <span class="kw">fn</span> <span class="ident">parse_const_pattern</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">span</span>: <span class="ident">Span</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Expr</span> {
+        <span class="self">self</span>.<span class="ident">parse_pattern</span>(<span class="ident">name</span>, <span class="ident">span</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_any_pattern</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Expr</span> {
-        <span class="self">self</span>.<span class="ident">parse_pattern</span>(<span class="ident">name</span>)
+    <span class="kw">fn</span> <span class="ident">parse_any_pattern</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">span</span>: <span class="ident">Span</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Expr</span> {
+        <span class="self">self</span>.<span class="ident">parse_pattern</span>(<span class="ident">name</span>, <span class="ident">span</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_open_paren</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Expr</span> {
-        <span class="self">self</span>.<span class="ident">input</span>().<span class="ident">next</span>(); <span class="comment">// eat open paren</span>
-        <span class="self">Self</span>::<span class="ident">Expr</span>::<span class="ident">Parend</span>(<span class="self">self</span>.<span class="ident">expr</span>())
+    <span class="kw">fn</span> <span class="ident">parse_open_paren</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_span</span>: <span class="ident">Span</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Expr</span> {
+        <span class="kw">let</span> <span class="ident">expr</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">Expr</span>::<span class="ident">Parend</span>(<span class="self">self</span>.<span class="ident">expr</span>());
+        <span class="self">self</span>.<span class="ident">input</span>().<span class="ident">next</span>(); <span class="comment">// TODO: check this is close paren</span>
+        <span class="ident">expr</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_open_bracket</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Expr</span> {
-        <span class="self">self</span>.<span class="ident">input</span>().<span class="ident">next</span>(); <span class="comment">// eat open paren</span>
-        <span class="self">Self</span>::<span class="ident">Expr</span>::<span class="ident">Bracketed</span>(<span class="self">self</span>.<span class="ident">expr</span>())
+    <span class="kw">fn</span> <span class="ident">parse_open_bracket</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_span</span>: <span class="ident">Span</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Expr</span> {
+        <span class="kw">let</span> <span class="ident">expr</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">Expr</span>::<span class="ident">Bracketed</span>(<span class="self">self</span>.<span class="ident">expr</span>());
+        <span class="self">self</span>.<span class="ident">input</span>().<span class="ident">next</span>(); <span class="comment">// TODO: check this is close bracket</span>
+        <span class="ident">expr</span>
     }
 
     <span class="kw">fn</span> <span class="ident">finish_expr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">expr</span>: <span class="self">Self</span>::<span class="ident">Expr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Rc</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Expr</span><span class="op">&gt;</span> {
@@ -310,23 +317,6 @@
         <span class="ident">variable_in_op_right</span>:    <span class="string">&quot;1 + a&quot;</span>
         <span class="ident">assignment_op</span>:           <span class="string">&quot;a = 5&quot;</span>
         <span class="ident">assignment_op_expr</span>:      <span class="string">&quot;a = 5 + 2 ^ 3&quot;</span>
-    }
-
-    <span class="macro">parser_error_tests</span><span class="macro">!</span> {
-        <span class="ident">parse_expression</span>
-
-        <span class="ident">variable_pattern</span>:        <span class="string">&quot;$a&quot;</span>      <span class="op">=</span><span class="op">&gt;</span> <span class="macro">concat</span><span class="macro">!</span>(<span class="string">r#&quot;The pattern &quot;$a&quot; cannot be used in an expression. &quot;#</span>,
-                                                      <span class="string">r#&quot;Consider using &quot;a&quot; as a variable instead.&quot;#</span>)
-        <span class="ident">const_pattern</span>:           <span class="string">&quot;#a&quot;</span>      <span class="op">=</span><span class="op">&gt;</span> <span class="macro">concat</span><span class="macro">!</span>(<span class="string">r##&quot;The pattern &quot;#a&quot; cannot be used in an expression. &quot;##</span>,
-                                                      <span class="string">r#&quot;Consider using &quot;a&quot; as a variable instead.&quot;#</span>)
-        <span class="ident">any_pattern</span>:             <span class="string">&quot;_a&quot;</span>      <span class="op">=</span><span class="op">&gt;</span> <span class="macro">concat</span><span class="macro">!</span>(<span class="string">r##&quot;The pattern &quot;_a&quot; cannot be used in an expression. &quot;##</span>,
-                                                      <span class="string">r#&quot;Consider using &quot;a&quot; as a variable instead.&quot;#</span>)
-
-        <span class="ident">multiple_errors</span>:         <span class="string">&quot;_a + $a&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">concat</span><span class="macro">!</span>(<span class="string">r##&quot;The pattern &quot;_a&quot; cannot be used in an expression. &quot;##</span>,
-                                                      <span class="string">r#&quot;Consider using &quot;a&quot; as a variable instead.&quot;#</span>,
-                                                      <span class="string">&quot;\n&quot;</span>,
-                                                      <span class="string">r##&quot;The pattern &quot;$a&quot; cannot be used in an expression. &quot;##</span>,
-                                                      <span class="string">r#&quot;Consider using &quot;a&quot; as a variable instead.&quot;#</span>)
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -356,4 +346,4 @@
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "libslide";</script><script src="../../../aliases.js"></script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "libslide";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>

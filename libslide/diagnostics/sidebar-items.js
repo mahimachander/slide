@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["DiagnosticKind","The kind of a slide diagnostic."]],"struct":[["Diagnostic","A diagnostic for slide source code."]]});
+initSidebarItems({"enum":[["DiagnosticKind","The kind of a slide diagnostic."]],"struct":[["AssociatedDiagnostic","A secondary diagnostic associated with a primary `Diagnostic`."],["Diagnostic","A diagnostic for slide source code."]]});

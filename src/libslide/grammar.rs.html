@@ -416,6 +416,14 @@
 <span id="416">416</span>
 <span id="417">417</span>
 <span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">mod</span> <span class="ident">pattern</span>;
 <span class="kw">mod</span> <span class="ident">transformer</span>;
@@ -442,6 +450,7 @@
     <span class="self">Self</span>: <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">BinaryExpr</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">UnaryExpr</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 {
     <span class="kw">fn</span> <span class="ident">is_const</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">empty</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
@@ -600,10 +609,17 @@
         <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">s_form</span>()
     }
 }
+
 <span class="kw">impl</span> <span class="ident">Expression</span> <span class="kw">for</span> <span class="ident">Expr</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">is_const</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="macro">matches</span><span class="macro">!</span>(<span class="self">self</span>, <span class="self">Self</span>::<span class="ident">Const</span>(<span class="kw">_</span>))
+    }
+
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">empty</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="comment">// Variables must be named, so we can encode an unnamed variable as an empty expression.</span>
+        <span class="ident">Expr</span>::<span class="ident">Var</span>(<span class="ident">String</span>::<span class="ident">new</span>())
     }
 }
 
@@ -836,4 +852,4 @@
 <span class="macro">display_unary_expr</span><span class="macro">!</span>(<span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span>);
 <span class="macro">display_unary_expr</span><span class="macro">!</span>(<span class="op">&lt;</span><span class="ident">ExprPat</span><span class="op">&gt;</span>);
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "libslide";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "libslide";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>

@@ -49,6 +49,32 @@
 <span id="49">49</span>
 <span id="50">50</span>
 <span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">common</span>::<span class="ident">Span</span>;
 
@@ -61,26 +87,39 @@
     <span class="doccomment">/// be particularly useful as an associated diagnostic, for example in expanding on a primary</span>
     <span class="doccomment">/// error.</span>
     <span class="ident">Note</span>,
+    <span class="doccomment">/// A help diagnostic should instruct the user how their code can be changed to work correctly</span>
+    <span class="doccomment">/// with slide.</span>
+    <span class="ident">Help</span>,
+}
+
+<span class="doccomment">/// A secondary diagnostic associated with a primary `Diagnostic`.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AssociatedDiagnostic</span> {
+    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">DiagnosticKind</span>,
+    <span class="kw">pub</span> <span class="ident">span</span>: <span class="ident">Span</span>,
+    <span class="kw">pub</span> <span class="ident">msg</span>: <span class="ident">String</span>,
 }
 
 <span class="doccomment">/// A diagnostic for slide source code.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Diagnostic</span> {
     <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">DiagnosticKind</span>,
     <span class="kw">pub</span> <span class="ident">span</span>: <span class="ident">Span</span>,
-    <span class="kw">pub</span> <span class="ident">msg</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">associated_diagnostics</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Diagnostic</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">title</span>: <span class="ident">String</span>,
+    <span class="kw">pub</span> <span class="ident">msg</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">associated_diagnostics</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AssociatedDiagnostic</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Diagnostic</span> {
     <span class="doccomment">/// Creates an error diagnostic at a span.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">span_err</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">M</span><span class="op">&gt;</span>(<span class="ident">span</span>: <span class="ident">S</span>, <span class="ident">err</span>: <span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Diagnostic</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">span_err</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">M</span>, <span class="ident">N</span><span class="op">&gt;</span>(<span class="ident">span</span>: <span class="ident">S</span>, <span class="ident">title</span>: <span class="ident">M</span>, <span class="ident">err</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Diagnostic</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span>,
         <span class="ident">M</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">N</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
         <span class="ident">Diagnostic</span> {
             <span class="ident">kind</span>: <span class="ident">DiagnosticKind</span>::<span class="ident">Error</span>,
             <span class="ident">span</span>: <span class="ident">span</span>.<span class="ident">into</span>(),
+            <span class="ident">title</span>: <span class="ident">title</span>.<span class="ident">into</span>(),
             <span class="ident">msg</span>: <span class="ident">err</span>.<span class="ident">into</span>(),
             <span class="ident">associated_diagnostics</span>: <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="number">2</span>),
         }
@@ -92,14 +131,27 @@
         <span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span>,
         <span class="ident">M</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     {
-        <span class="self">self</span>.<span class="ident">associated_diagnostics</span>.<span class="ident">push</span>(<span class="ident">Diagnostic</span> {
+        <span class="self">self</span>.<span class="ident">associated_diagnostics</span>.<span class="ident">push</span>(<span class="ident">AssociatedDiagnostic</span> {
             <span class="ident">kind</span>: <span class="ident">DiagnosticKind</span>::<span class="ident">Note</span>,
             <span class="ident">span</span>: <span class="ident">span</span>.<span class="ident">into</span>(),
             <span class="ident">msg</span>: <span class="ident">note</span>.<span class="ident">into</span>(),
-            <span class="ident">associated_diagnostics</span>: <span class="macro">vec</span><span class="macro">!</span>[],
+        });
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Adds a help message to the diagnostic, possibly at a different span.</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">with_help</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">M</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">span</span>: <span class="ident">S</span>, <span class="ident">note</span>: <span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Diagnostic</span>
+    <span class="kw">where</span>
+        <span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span>,
+        <span class="ident">M</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    {
+        <span class="self">self</span>.<span class="ident">associated_diagnostics</span>.<span class="ident">push</span>(<span class="ident">AssociatedDiagnostic</span> {
+            <span class="ident">kind</span>: <span class="ident">DiagnosticKind</span>::<span class="ident">Help</span>,
+            <span class="ident">span</span>: <span class="ident">span</span>.<span class="ident">into</span>(),
+            <span class="ident">msg</span>: <span class="ident">note</span>.<span class="ident">into</span>(),
         });
         <span class="self">self</span>
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "libslide";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "libslide";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
