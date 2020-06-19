@@ -14,7 +14,7 @@ The output is the produced using slide's custom error messages!
 
 <h2> Testing <h2>
 Every contribution to slides must have tests. If your PR does not, tests will most likely be requested. Slide has its own 
-custom framework called ladder that makes it super easy to test for both errors and proper simplifications. It automatically
+development tool called `ladder` that makes it easy to test for both errors and proper simplifications. It automatically
 tests all "cargo test" unit tests implemented. The entire test system is described under slide/src/test. Basically, one just
 has to create a file with their issue number and add their expected input/output in the same file using delimeters. Please 
 take a look at the previous files for more clarification
@@ -27,6 +27,5 @@ to begin contributing to slide.
 [![GitHub help-wanted](https://img.shields.io/github/issues/rust-lang/rustfmt/help-wanted?style=flat-square)]
 (https://github.com/ayazhafiz/slide/labels/help%20wanted)
 If you ever get stuck, please feel free to reach out on the issue with questions/suggestionsfor implementations
-
 
 
