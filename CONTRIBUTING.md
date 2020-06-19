@@ -1,4 +1,4 @@
-<h1> Contributing <h1>
+# Contributing
 Contributions to slide are warmly welcomed. Here's an overview of the code base of a slide and how to contribute!
 
 <h2> Building <h2>
@@ -27,7 +27,6 @@ to begin contributing to slide.
 [![GitHub help-wanted](https://img.shields.io/github/issues/rust-lang/rustfmt/help-wanted?style=flat-square)]
 (https://github.com/ayazhafiz/slide/labels/help%20wanted)
 If you ever get stuck, please feel free to reach out on the issue with questions/suggestionsfor implementations
-
 
 
 
