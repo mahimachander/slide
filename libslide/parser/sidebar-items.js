@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["unclosed_delimiter","Returns a diagnostic for an unclosed delimiter."]],"mod":[["expression_parser",""],["expression_pattern_parser",""],["test_utils",""]],"trait":[["Parser",""]]});
+initSidebarItems({"fn":[["extra_tokens_diag","Returns a diagnostic for extra tokens following a primary item. `extra_tokens` will be consumed in the construction of the diagnostic."],["unclosed_delimiter","Returns a diagnostic for an unclosed delimiter."]],"mod":[["expression_parser",""],["expression_pattern_parser",""],["test_utils",""]],"trait":[["Parser",""]]});

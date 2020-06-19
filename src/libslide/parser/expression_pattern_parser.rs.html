@@ -126,8 +126,11 @@
 <span id="126">126</span>
 <span id="127">127</span>
 <span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Parser</span>;
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">extra_tokens_diag</span>, <span class="ident">Parser</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">common</span>::<span class="ident">Span</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">diagnostics</span>::<span class="ident">Diagnostic</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">grammar</span>::<span class="kw-2">*</span>;
@@ -172,7 +175,10 @@
 
     <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">ExprPat</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">parsed</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">expr</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">done</span>());
+        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">done</span>() {
+            <span class="kw">let</span> <span class="ident">extra_tokens_diag</span> <span class="op">=</span> <span class="ident">extra_tokens_diag</span>(<span class="self">self</span>.<span class="ident">input</span>());
+            <span class="self">self</span>.<span class="ident">push_diag</span>(<span class="ident">extra_tokens_diag</span>);
+        }
         <span class="ident">parsed</span>
     }
 
@@ -256,4 +262,4 @@
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "libslide";</script><script src="../../../aliases.js"></script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "libslide";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
